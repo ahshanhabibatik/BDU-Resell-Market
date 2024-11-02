@@ -6,7 +6,7 @@ import Header from "../Pages/Home/Header/Header";
 
 const Root = () => {
     return (
-        <div>
+        <div className="bg-[#010313]">
             <Header></Header>
             <Navbar></Navbar>
             <Outlet></Outlet>
