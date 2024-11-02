@@ -1,28 +1,30 @@
-
 import { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../Provider/AuthProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
     const { createUser } = useContext(AuthContext);
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const navigate = useNavigate();
+    const apiKey = import.meta.env.VITE_Image_apiKe;
+    const image_hosting_api = `https://api.imgbb.com/1/upload?key${apiKey}`;
+
 
 
     const onSubmit = async (data) => {
         try {
-            await createUser(data.email, data.password);
+            const imageUrl = await uploadImageToImageBB(data.image[0]);
+            await createUser(data.email, data.password, imageUrl);  // Pass imageUrl to createUser
             navigate('/');
             reset();
         } catch (error) {
-            console.error("Login failed:", error);
+            console.error("Registration failed:", error);
         }
     };
-
     return (
-        <div className="flex items-center justify-center min-h-screen ">
-            <div className="w-full max-w-md p-8 space-y-6  border rounded-lg shadow-lg">
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="w-full max-w-md p-8 space-y-6 border rounded-lg shadow-lg">
                 <h2 className="text-2xl font-bold text-center text-white">Create Your Account</h2>
 
                 <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -81,6 +83,12 @@ const Register = () => {
                         Register
                     </button>
                 </form>
+
+                {/* Link to Login page */}
+                <p className="text-center text-sm text-white">
+                    Already have an account?
+                    <Link to="/login" className="text-blue-500 hover:underline"> Log In</Link>
+                </p>
             </div>
         </div>
     );

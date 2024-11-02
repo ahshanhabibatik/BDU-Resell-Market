@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../Provider/AuthProvider';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate, Link } from 'react-router-dom'; // Import Link
 
 const Login = () => {
     const { signIn, signInWithGoogle } = useContext(AuthContext);
@@ -81,6 +81,12 @@ const Login = () => {
                 >
                     <span>Sign in with Google</span>
                 </button>
+
+                {/* Link to Register page */}
+                <p className="text-center text-sm text-white">
+                    Don't have an account?
+                    <Link to="/register" className="text-blue-500 hover:underline"> Sign Up</Link>
+                </p>
             </div>
         </div>
     );

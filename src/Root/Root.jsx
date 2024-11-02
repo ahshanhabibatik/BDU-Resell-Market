@@ -1,16 +1,18 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import Header from "../Pages/Home/Header/Header";
 
-
-
 const Root = () => {
+    const location = useLocation();
+
+    // Determine if the current path is either "/login" or "/register"
+    const shouldShowHeaderAndNavbar = !['/login', '/register'].includes(location.pathname);
+
     return (
         <div className="bg-[#010313]">
-            <Header></Header>
-            <Navbar></Navbar>
-            <Outlet></Outlet>
-
+            {shouldShowHeaderAndNavbar && <Header />}
+            {shouldShowHeaderAndNavbar && <Navbar />}
+            <Outlet />
         </div>
     );
 };
