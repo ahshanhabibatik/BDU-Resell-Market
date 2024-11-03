@@ -39,7 +39,6 @@ const AuthProvider = ({ children }) => {
             return {
                 displayName: user.displayName,
                 email: user.email,
-                photoURL: user.photoURL,
             }; // Return a more structured user object
         } catch (error) {
             console.error("Google login failed:", error);

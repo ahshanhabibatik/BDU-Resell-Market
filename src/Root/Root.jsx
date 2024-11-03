@@ -9,7 +9,7 @@ const Root = () => {
     const shouldShowHeaderAndNavbar = !['/login', '/register'].includes(location.pathname);
 
     return (
-        <div className="bg-[#010313]">
+        <div className="bg-[#010313] mx-2">
             {shouldShowHeaderAndNavbar && <Header />}
             {shouldShowHeaderAndNavbar && <Navbar />}
             <Outlet />

@@ -3,8 +3,12 @@ import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../Provider/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
 import useAxiosPublic from '../../Hook/AxiosPublic';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify'; // Import toast from react-toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 import axios from 'axios';
+
+// Initialize ToastContainer at the top level of your app (e.g., in App.js)
+import { ToastContainer } from 'react-toastify';
 
 const Register = () => {
     const { createUser } = useContext(AuthContext);
@@ -14,7 +18,7 @@ const Register = () => {
     const image_hosting_api = `https://api.imgbb.com/1/upload?key=${apiKey}`;
     const axiosPublic = useAxiosPublic();
 
-    const [loading, setLoading] = useState(false); // Step 1: Add loading state
+    const [loading, setLoading] = useState(false);
 
     const uploadImageToImageBB = async (imageFile) => {
         const formData = new FormData();
@@ -30,47 +34,57 @@ const Register = () => {
     };
 
     const saveUserDataInDatabase = async (userData) => {
-        console.log("Sending user data:", userData); // Log user data
+        console.log("Sending user data:", userData);
         try {
             await axios.post('http://localhost:5000/users', userData);
             toast.success("User created successfully!", {
-                duration: 2000, // Display for 2 seconds
-                position: 'top-center' // Position the toast at the top center
+                position: 'top-center'
             });
         } catch (error) {
-            console.error("Failed to save user data:", error); // Log error details
+            console.error("Failed to save user data:", error);
             toast.error("Failed to save user data. Please try again.");
             throw new Error("Failed to save user data");
         }
     };
 
     const onSubmit = async (data) => {
-        setLoading(true); // Step 2: Set loading to true
+        setLoading(true);
         try {
-            const photoURL = await uploadImageToImageBB(data.photoURL[0]); // Ensure correct field name for the file input
+            const photoURL = await uploadImageToImageBB(data.photoURL[0]);
+
+            // Attempt to create user
             await createUser(data.email, data.password);
 
             const userData = {
                 name: data.name,
                 email: data.email,
                 photoURL: photoURL,
+                Role: "user",
             };
 
             // Send data to your backend
-            await saveUserDataInDatabase(userData); // Call your function to save data
+            await saveUserDataInDatabase(userData);
 
             navigate('/'); // Redirect after successful registration
             reset(); // Reset the form
         } catch (error) {
-            console.error("Registration failed:", error); // Log the error details
-            toast.error("Registration failed. Please try again.");
+            console.error("Registration failed:", error);
+
+            // Check if the error indicates that the user already exists
+            if (error.response && error.response.status === 400) {
+                // Assuming 400 is the status for existing user
+                toast.error("User already exists. Please try logging in.");
+            } else {
+                toast.error("User already exists. Please try logging in.");
+            }
         } finally {
-            setLoading(false); // Step 3: Reset loading state
+            setLoading(false);
         }
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen">
+            <ToastContainer /> {/* Add the ToastContainer here */}
             <div className="w-full max-w-md p-8 space-y-6 border rounded-lg shadow-lg">
                 <h2 className="text-2xl font-bold text-center text-white">Create Your Account</h2>
 
@@ -125,10 +139,10 @@ const Register = () => {
 
                     <button
                         type="submit"
-                        disabled={loading} // Disable the button when loading
+                        disabled={loading}
                         className="w-full px-4 py-2 font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
                     >
-                        {loading ? 'Processing...' : 'Register'} {/* Change button text based on loading state */}
+                        {loading ? 'Processing...' : 'Register'}
                     </button>
                 </form>
 

@@ -6,6 +6,7 @@ import '../../../GoogleFont/fonts.css';
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../Provider/AuthProvider";
 import useAxiosPublic from "../../../Hook/AxiosPublic";
+import toast from 'react-hot-toast';
 
 const Header = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,7 +50,7 @@ const Header = () => {
                     const response = await axiosPublic.get(`/users/${user.email}`);
                     setUserData(response.data);
                 } catch (error) {
-                    console.error("Failed to fetch user data:", error);
+                    toast.error("Failed to fetch user data. Please try again.");
                 }
             }
         };
@@ -114,7 +115,7 @@ const Header = () => {
                     {user ? (
                         <>
                             <button className="w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 mb-2">
-                                <Link to="/dashboard">Dashboard</Link>
+                                <Link to="dashboard">Dashboard</Link>
                             </button>
                             <button
                                 onClick={handleLogout}

@@ -1,63 +1,56 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../../Provider/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios'; // Import axios at the top
-import { ToastContainer, toast } from 'react-toastify'; // Import toast and ToastContainer
-import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
+import toast from 'react-hot-toast';
 
 const Login = () => {
     const { signIn, signInWithGoogle } = useContext(AuthContext);
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // Loading state
 
-    const handleLogin = async (data) => {
-        setLoading(true);
+    const onSubmit = async (data) => {
+        setLoading(true); // Start loading
         try {
             await signIn(data.email, data.password);
-            setErrorMessage('');
-            toast.success("Login successful!"); // Show success toast
-            navigate('/');
+            navigate('/'); // Redirect after successful login
+            toast.success("Login successful!", {
+                duration: 2000,
+                position: 'top-center'
+            });
         } catch (error) {
-            setErrorMessage("Login failed: " + error.message);
-            toast.error("Wrong password or email!"); // Show error toast
+            console.error("Login failed:", error);
+            toast.error("Login failed. Please try again.");
         } finally {
-            setLoading(false); // Reset loading state
+            setLoading(false); // Stop loading
         }
     };
 
-    const handleGoogleLogin = async () => {
+    const handleGoogleSignIn = async () => {
+        setLoading(true);
         try {
-            const user = await signInWithGoogle(); // Get structured user data
-            const { displayName, email, photoURL } = user;
-
-            const userData = {
-                name: displayName,
-                email: email,
-                photoURL: photoURL,
-            };
-
-            await axios.post('http://localhost:5000/users', userData);
-            setErrorMessage('');
-            toast.success("Login successful!"); // Show success toast for Google login
-            navigate('/');
+            await signInWithGoogle();
+            navigate('/'); // Navigate after successful login
+            toast.success("Google login successful!", {
+                duration: 2000,
+                position: 'top-center'
+            });
         } catch (error) {
-            console.error("Google login failed:", error);
-            setErrorMessage("Google login failed: " + error.message);
-            toast.error("Google login failed!"); // Show error toast
+            console.error("Google sign-in failed:", error);
+            toast.error("Google sign-in failed. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen">
-            <div className="w-full max-w-md p-8 space-y-4 border rounded-lg shadow-lg">
+            <div className="w-full max-w-md p-8 space-y-6 border rounded-lg shadow-lg">
                 <h2 className="text-2xl font-bold text-center text-white">Login to Your Account</h2>
 
-                {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
-
-                <form className="space-y-4" onSubmit={handleSubmit(handleLogin)}>
+                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                    {/* Email Field */}
                     <div>
                         <label className="block text-sm font-medium text-white">Email Address</label>
                         <input
@@ -69,6 +62,7 @@ const Login = () => {
                         {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                     </div>
 
+                    {/* Password Field */}
                     <div>
                         <label className="block text-sm font-medium text-white">Password</label>
                         <input
@@ -83,31 +77,25 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full px-4 py-2 font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                        className={`w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                        {loading ? 'Processing...' : 'Sign In'}
+                        {loading ? 'Logging In...' : 'Login'}
                     </button>
                 </form>
 
-                <div className="flex items-center justify-center space-x-2">
-                    <span className="block w-16 h-px bg-gray-300"></span>
-                    <span className="text-sm font-medium text-gray-500">or</span>
-                    <span className="block w-16 h-px bg-gray-300"></span>
-                </div>
-
                 <button
-                    onClick={handleGoogleLogin}
-                    className="flex items-center justify-center w-full px-4 py-2 space-x-2 text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    onClick={handleGoogleSignIn}
+                    disabled={loading}
+                    className={`w-full py-2 text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    <span>Sign in with Google</span>
+                    {loading ? 'Signing In with Google...' : 'Sign In with Google'}
                 </button>
 
-                <p className="text-center text-sm text-white">
-                    Don't have an account?
-                    <Link to="/register" className="text-blue-500 hover:underline"> Sign Up</Link>
+                <p className="text-sm text-center text-gray-600">
+                    Don't have an account?{' '}
+                    <Link to="/register" className="font-semibold text-blue-600 hover:underline">Register</Link>
                 </p>
             </div>
-            <ToastContainer /> {/* Add ToastContainer for toast notifications */}
         </div>
     );
 };

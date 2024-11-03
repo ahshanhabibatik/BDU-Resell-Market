@@ -5,6 +5,8 @@ import Root from "../Root/Root";
 import Home from "../Pages/Home/Home/Home";
 import Register from "../Pages/Register/Register";
 import Login from "../Pages/Login/Login";
+import DashBoard from "../Layout/DashBoard";
+import ManageUser from "../AdminPanel/ManageUser";
 
 export const router = createBrowserRouter([
     {
@@ -26,4 +28,21 @@ export const router = createBrowserRouter([
 
         ]
     },
+
+    {
+        path: 'dashboard',
+        element: <DashBoard></DashBoard>,
+        children: [
+            {
+                path: 'Users',
+                element: <ManageUser></ManageUser>
+            },
+
+
+
+
+
+
+        ]
+    }
 ]);
