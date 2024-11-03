@@ -9,7 +9,7 @@ const auth = getAuth(app);
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState();
     const [loading, setLoading] = useState(true);
-    const provider = new GoogleAuthProvider();  
+    const provider = new GoogleAuthProvider();
 
     // Create user with email and password
     const createUser = (email, password) => {
@@ -36,7 +36,11 @@ const AuthProvider = ({ children }) => {
             const result = await signInWithPopup(auth, provider);
             const user = result.user; // Get the user information
             console.log("Google login successful:", user);
-            return user; // Return user for further use if needed
+            return {
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+            }; // Return a more structured user object
         } catch (error) {
             console.error("Google login failed:", error);
             throw error; // Propagate error to handle in the component

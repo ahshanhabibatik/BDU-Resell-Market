@@ -5,6 +5,7 @@ import { IoMdLogIn } from "react-icons/io";
 import '../../../GoogleFont/fonts.css';
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../Provider/AuthProvider";
+import useAxiosPublic from "../../../Hook/AxiosPublic";
 
 const Header = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,6 +13,8 @@ const Header = () => {
     const modalRef = useRef(null);
     const { user, logOut } = useContext(AuthContext);
     const navigate = useNavigate();
+    const axiosPublic = useAxiosPublic();
+    const [userData, setUserData] = useState(null);
 
     const handleLogout = async () => {
         await logOut();
@@ -37,6 +40,22 @@ const Header = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (user?.email) {
+                try {
+                    const response = await axiosPublic.get(`/users/${user.email}`);
+                    setUserData(response.data);
+                } catch (error) {
+                    console.error("Failed to fetch user data:", error);
+                }
+            }
+        };
+
+        fetchUserData();
+    }, [user, axiosPublic]);
 
     return (
         <div className="relative inter">
@@ -74,7 +93,7 @@ const Header = () => {
                     >
                         {user ? (
                             <img
-                                src={user?.photoURL || user?.imageUrl} // Display the uploaded image
+                                src={user?.photoURL || userData?.photoURL}
                                 alt="User"
                                 className="w-8 h-8 rounded-full"
                             />
